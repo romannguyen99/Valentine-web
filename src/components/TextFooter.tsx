@@ -11,23 +11,19 @@ export default function TextFooter() {
     <>
       {/* Left Text */}
       <h1
-        className={`absolute left-10 bottom-5 transform -translate-y-1/2 text-white text-4xl lg:text-5xl font-bold leading-tight ${playfairDisplay.className}`}
+        className={`absolute left-10 bottom-5 transform -translate-y-1/2 text-4xl lg:text-5xl font-bold leading-tight ${playfairDisplay.className}`}
+        style={{ color: "var(--foreground)" }}
       >
-        <span className="text-gray-400">Match</span> <br /> the photo pairs
+        <span style={{ color: "var(--accent-pink)" }}>Chỉ dành cho</span> <br /> Phương Hiền
       </h1>
 
       {/* Right Text */}
       <h1
-        className={`absolute right-10 bottom-5 transform -translate-y-1/2 text-white text-4xl lg:text-5xl font-bold leading-tight text-right ${playfairDisplay.className}`}
+        className={`absolute right-10 bottom-5 transform -translate-y-1/2 text-4xl lg:text-5xl font-bold leading-tight text-right ${playfairDisplay.className}`}
+        style={{ color: "var(--foreground)" }}
       >
-        to reveal <br /> <span className="text-gray-400">the surprise</span>
+        Giải trò chơi <br /> <span style={{ color: "var(--accent-pink)" }}>sẽ có bất ngờ!</span>
       </h1>
-
-      {/* Copyright */}
-      <p className="absolute bottom-5 right-5 text-white text-sm opacity-15 hover:opacity-50">
-        © {new Date().getFullYear()}{" "}
-        <Link href="https://visibait.com">visibait.com</Link>
-      </p>
     </>
   );
 }

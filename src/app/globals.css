@@ -3,19 +3,18 @@
 @tailwind utilities;
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  /* The main pink gradient background */
+  --background: radial-gradient(circle at top, #ffe3f2 0%, #fff8fb 45%, #ffffff 100%);
+  /* The dark purple text color */
+  --foreground: #33102a;
+  /* Pink accent color used for subtitles */
+  --accent-pink: #aa3167;
 }
 
 body {
   color: var(--foreground);
   background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: "Segoe UI", system-ui, sans-serif;
+  margin: 0;
+  min-height: 100vh;
 }

@@ -5,36 +5,37 @@ import Image from "next/image";
 import { useState, useEffect } from "react";
 
 // 18 images
-const images = [
-  "/game-photos/1.avif",
-  "/game-photos/2.avif",
-  "/game-photos/3.avif",
-  "/game-photos/4.avif",
-  "/game-photos/5.avif",
-  "/game-photos/6.avif",
-  "/game-photos/7.avif",
-  "/game-photos/8.avif",
-  "/game-photos/9.avif",
-  "/game-photos/10.avif",
-  "/game-photos/11.avif",
-  "/game-photos/12.avif",
-  "/game-photos/13.avif",
-  "/game-photos/14.avif",
-  "/game-photos/15.avif",
-  "/game-photos/16.avif",
-  "/game-photos/17.avif",
-  "/game-photos/18.avif",
+const imagesList = [
+"/game-photos/1.jpeg",
+"/game-photos/3.jpeg",
+"/game-photos/2.jpeg",
+"/game-photos/6.jpeg",
+"/game-photos/7.jpeg",
+"/game-photos/8.jpeg",
+"/game-photos/10.jpeg",
+"/game-photos/12.jpeg",
+"/game-photos/14.jpeg",
+"/game-photos/15.jpeg",
+"/game-photos/17.jpeg",
+"/game-photos/19.jpeg",
+"/game-photos/20.jpeg",
+"/game-photos/21.jpeg",
+"/game-photos/23.jpeg",
+"/game-photos/24.jpeg",
+"/game-photos/25.jpeg",
+"/game-photos/18.jpeg",
 ];
 
 // Create 18 pairs of images (36 images in total)
-const imagePairs = images.flatMap((image) => [image, image]);
+const imagePairs = imagesList.flatMap((image) => [image, image]);
 
 const shuffleArray = (array: string[]) => {
-  for (let i = array.length - 1; i > 0; i--) {
+  const newArray = [...array];
+  for (let i = newArray.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
-    [array[i], array[j]] = [array[j], array[i]];
+    [newArray[i], newArray[j]] = [newArray[j], newArray[i]];
   }
-  return array;
+  return newArray;
 };
 
 const heartLayout = [
@@ -56,110 +57,95 @@ export default function PhotoPairGame({
 }: ValentinesProposalProps) {
   const [selected, setSelected] = useState<number[]>([]);
   const [matched, setMatched] = useState<number[]>([]);
-  const [incorrect, setIncorrect] = useState<number[]>([]);
-  const [images] = useState(() => shuffleArray([...imagePairs]));
+  const [isChecking, setIsChecking] = useState(false);
+  const [gameImages] = useState(() => shuffleArray(imagePairs));
 
-  const handleClick = async (index: number) => {
-    if (selected.length === 2 || matched.includes(index)) return;
+  const handleClick = (index: number) => {
+    if (isChecking || selected.includes(index) || matched.includes(index))
+      return;
 
-    setSelected((prev) => [...prev, index]);
+    const newSelected = [...selected, index];
+    setSelected(newSelected);
 
-    if (selected.length === 1) {
-      const firstIndex = selected[0];
-      if (images[firstIndex] === images[index]) {
-        setMatched((prev) => [...prev, firstIndex, index]);
+    if (newSelected.length === 2) {
+      setIsChecking(true);
+      const firstIndex = newSelected[0];
+      const secondIndex = newSelected[1];
+
+      if (gameImages[firstIndex] === gameImages[secondIndex]) {
+        setMatched((prev) => [...prev, firstIndex, secondIndex]);
+        setSelected([]);
+        setIsChecking(false);
       } else {
-        await new Promise((resolve) => setTimeout(resolve, 1000)); // Wait 1 second
-
-        setIncorrect([firstIndex, index]);
-        setTimeout(() => setIncorrect([]), 1000); // Clear incorrect after 1 second
+        setTimeout(() => {
+          setSelected([]);
+          setIsChecking(false);
+        }, 1000);
       }
-      setTimeout(() => setSelected([]), 1000);
     }
   };
 
-  // Check if game is won
   useEffect(() => {
-    if (matched.length === imagePairs.length) {
-      handleShowProposal();
+    if (matched.length === imagePairs.length && matched.length > 0) {
+      setTimeout(handleShowProposal, 500);
     }
   }, [matched, handleShowProposal]);
 
   return (
     <div className="grid grid-cols-9 gap-1 lg:gap-2 max-w-[95vw] mx-auto place-items-center">
-      {/* Image preload */}
-      <div className="hidden">
-        {images.map((image, i) => (
-          <Image
-            key={i}
-            src={image}
-            alt={`Image ${i + 1}`}
-            layout="fill"
-            objectFit="cover"
-            priority
-          />
-        ))}
-      </div>
+      {heartLayout.flat().map((index, i) => {
+        if (index === null) {
+          return <div key={i} className="w-[11vh] h-[11vh] lg:w-20 lg:h-20" />;
+        }
 
-      {heartLayout.flat().map((index, i) =>
-        index !== null ? (
-          <motion.div
+        const isFlipped = selected.includes(index) || matched.includes(index);
+
+        return (
+          <div
             key={i}
-            className="w-[11vh] h-[11vh] lg:w-20 lg:h-20 relative cursor-pointer"
-            whileHover={{ scale: 1.1 }}
+            className="w-[11vh] h-[11vh] lg:w-20 lg:h-20 relative cursor-pointer group"
             onClick={() => handleClick(index)}
-            style={{ perspective: "1000px" }} // Add perspective for 3D effect
+            style={{ perspective: "1000px" }}
           >
-            {/* Back of the card */}
-            {!selected.includes(index) && !matched.includes(index) && (
-              <motion.div
-                className="w-full h-full bg-gray-300 rounded-sm lg:rounded-md absolute z-10"
-                initial={{ rotateY: 0 }}
-                animate={{
-                  rotateY:
-                    selected.includes(index) || matched.includes(index)
-                      ? 180
-                      : 0,
+            <motion.div
+              className="w-full h-full relative"
+              initial={false}
+              animate={{ rotateY: isFlipped ? 180 : 0 }}
+              transition={{
+                duration: 0.6,
+                type: "spring",
+                stiffness: 260,
+                damping: 20,
+              }}
+              style={{ transformStyle: "preserve-3d" }}
+            >
+              {/* Front of Card (The Image) - Hidden until flipped */}
+              <div
+                className="absolute w-full h-full rounded-sm lg:rounded-md overflow-hidden border-2 border-pink-300 bg-white"
+                style={{
+                  transform: "rotateY(180deg)",
+                  backfaceVisibility: "hidden",
                 }}
-                transition={{ duration: 0.5 }}
-                style={{ backfaceVisibility: "hidden" }}
-              />
-            )}
-
-            {/* Front of the card (image) */}
-            {(selected.includes(index) || matched.includes(index)) && (
-              <motion.div
-                className="w-full h-full absolute"
-                initial={{ rotateY: -180 }}
-                animate={{ rotateY: 0 }}
-                transition={{ duration: 0.5 }}
-                style={{ backfaceVisibility: "hidden" }}
               >
                 <Image
-                  src={images[index]}
-                  alt={`Imagen ${index + 1}`}
-                  layout="fill"
-                  objectFit="cover"
-                  className="rounded-sm lg:rounded-md object-cover"
+                  src={gameImages[index]}
+                  alt={`Memory Card ${index}`}
+                  fill
+                  sizes="(max-width: 768px) 11vh, 80px"
+                  className="object-cover"
+                  priority={true} // Ensures image loads immediately
                 />
-              </motion.div>
-            )}
+              </div>
 
-            {/* Incorrect animation */}
-            {incorrect.includes(index) && (
-              <motion.div
-                className="absolute inset-0"
-                animate={{ scale: [1, 1.1, 1], opacity: [1, 0, 1] }}
-                transition={{ duration: 0.5 }}
-              >
-                <div className="w-full h-full bg-red-500 rounded-sm lg:rounded-md"></div>
-              </motion.div>
-            )}
-          </motion.div>
-        ) : (
-          <div key={i} className="w-[11vh] h-[11vh] lg:w-20 lg:h-20" />
-        ),
-      )}
+              {/* Back of Card (The Gray Cover) */}
+              <div
+                className="absolute w-full h-full bg-gray-300 rounded-sm lg:rounded-md shadow-sm hover:bg-gray-400 transition-colors"
+                style={{ backfaceVisibility: "hidden" }}
+              />
+            </motion.div>
+          </div>
+        );
+      })}
     </div>
   );
 }

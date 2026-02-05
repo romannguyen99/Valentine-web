@@ -22,7 +22,7 @@ export default function Home() {
 
   return (
     <OrientationGuard>
-      <main className="flex items-center justify-center min-h-screen bg-black overflow-hidden relative">
+      <main className="flex items-center justify-center min-h-screen bg-transparent overflow-hidden relative">
         {!showValentinesProposal ? (
           <motion.div
             initial={{ opacity: 1 }}
